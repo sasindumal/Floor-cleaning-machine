@@ -12,6 +12,7 @@
 #define Roller 8
 #define MOP 9
 #define Pump 10
+#define Dry 11
 
 #define Usf_Echo A0
 #define Usf_Trig A1
@@ -43,6 +44,7 @@ void setup() {
   pinMode(Pump, OUTPUT);
   pinMode(MOP, OUTPUT);
   pinMode(Roller, OUTPUT);
+  pinMode(Dry, OUTPUT);
   initializeUS();
   Serial.begin(9600); 
 }
@@ -249,6 +251,16 @@ void manualMode()
     incomingByte='*';
     break;
 
+    case 'K':
+    digitalWrite(Dry, HIGH);
+    incomingByte='*';
+    break;
+    
+    case 'k':
+    digitalWrite(Dry, LOW); 
+    incomingByte='*';
+    break;
+
     case '1':
     motor_speed = 155;
     incomingByte='*';
@@ -444,6 +456,38 @@ void checkautomode(){
     autoModeOn = 1;
     incomingByte='*';
   }
+
+void pump(state){
+  while (state==1){
+    digitalWrite(Pump, HIGH);
+    delay(1000);
+    digitalWrite(Pump, Low);
+    delay(1000);
+  }
+}
+
+void Dry(state){
+  while (state==1){
+    digitalWrite(Dry, HIGH);
+  }
+  digitalWrite(Dry, LOW);
+}
+
+void Roller(state){
+  while (state==1){
+    digitalWrite(Roller, HIGH);
+  }
+  digitalWrite(Roller, LOW);
+}
+
+void MOP(state){
+  while (state==1){
+    digitalWrite(MOP, HIGH);
+  }
+  digitalWrite(MOP, LOW);
+
+}
+
 
 
 }
