@@ -25,6 +25,7 @@
 
 int motor_speed = 255;
 int autoModeOn = 0;
+pumpstate =0;
 char incomingByte;
 
 unsigned long prev_t = 0;
@@ -45,6 +46,12 @@ void setup() {
   pinMode(MOP, OUTPUT);
   pinMode(Roller, OUTPUT);
   pinMode(Dry, OUTPUT);
+  pinMode(L1, OUTPUT);
+  pinMode(L2, OUTPUT);
+  pinMode(LENB, OUTPUT);
+  pinMode(R1, OUTPUT);
+  pinMode(R2, OUTPUT);
+  pinMode(RENB, OUTPUT);
   initializeUS();
   Serial.begin(9600); 
 }
@@ -200,19 +207,39 @@ void manualMode()
     move_f();
     incomingByte='*';
     break;
+
+    case 'f':
+    move_s();
+    incomingByte='*';
+    break;
     
     case 'B':
     move_b();
     incomingByte='*';
     break;
     
+    case 'b':
+    move_s();
+    incomingByte='*';
+    break;
+
     case 'L':
     turn_l();
+    incomingByte='*';
+    break;
+
+    case 'l':
+    move_s();
     incomingByte='*';
     break;
     
     case 'R':
     turn_r();
+    incomingByte='*';
+    break;
+
+    case 'r':
+    move_s();
     incomingByte='*';
     break;
     
@@ -222,12 +249,12 @@ void manualMode()
     break;
     
     case 'P':
-    digitalWrite(Pump, HIGH);
+    pumpON();
     incomingByte='*';
     break;
     
     case 'p':
-    digitalWrite(Pump, LOW); 
+    pumpOFF(); 
     incomingByte='*';
     break;
     
@@ -251,12 +278,12 @@ void manualMode()
     incomingByte='*';
     break;
 
-    case 'K':
+    case 'Q':
     digitalWrite(Dry, HIGH);
     incomingByte='*';
     break;
     
-    case 'k':
+    case 'q':
     digitalWrite(Dry, LOW); 
     incomingByte='*';
     break;
@@ -293,6 +320,10 @@ void move_s() {
   
 void move_f() {
   Serial.println("Forward");
+  rollerON();
+  pumpON();
+  mopON();
+  dryON();
   digitalWrite(L1, LOW); 
   analogWrite(L2, motor_speed);
   analogWrite(R1, motor_speed);
@@ -308,6 +339,10 @@ void move_b() {
 }
 
 void move_oneblock() {
+    rollerON();
+    pumpON();
+    mopON();
+    dryON();
     Serial.println("OneBlock");
     digitalWrite(L1, LOW); 
     analogWrite(L2, motor_speed);
@@ -318,6 +353,10 @@ void move_oneblock() {
 }
 
 void turn_r() {
+  rollerOFF();
+  pumpOFF();
+  mopOFF();
+  dryOFF();
   Serial.println("Right");
   digitalWrite(L1, LOW); 
   analogWrite(L2, motor_speed);
@@ -327,6 +366,10 @@ void turn_r() {
 } 
 
 void turn_l() {
+  rollerOFF();
+  pumpOFF();
+  mopOFF();
+  dryOFF();
   Serial.println("Left");
   analogWrite(L1, motor_speed); 
   digitalWrite(L2, LOW);
@@ -456,40 +499,47 @@ void checkautomode(){
     autoModeOn = 1;
     incomingByte='*';
   }
+}
 
-void pump(state){
-  while (state==1){
+void pumpON(){
+  pumpstate = 1;
+  while (pumpstate==1){
     digitalWrite(Pump, HIGH);
     delay(1000);
-    digitalWrite(Pump, Low);
-    delay(1000);
+    digitalWrite(Pump, LOW);
+    delay(3000);
   }
 }
 
-void Dry(state){
-  while (state==1){
-    digitalWrite(Dry, HIGH);
-  }
-  digitalWrite(Dry, LOW);
+void pumpOFF(){
+  pumpstate = 0;
 }
 
-void Roller(state){
-  while (state==1){
-    digitalWrite(Roller, HIGH);
-  }
+
+void rollerON(){
+  digitalWrite(Roller, HIGH);
+}
+
+void rollerOFF(){
   digitalWrite(Roller, LOW);
 }
 
-void MOP(state){
-  while (state==1){
-    digitalWrite(MOP, HIGH);
-  }
-  digitalWrite(MOP, LOW);
 
+void mopON(){
+  digitalWrite(MOP, HIGH);
+}
+
+void mopOFF(){
+  digitalWrite(MOP, LOW);
 }
 
 
+void dryON(){
+  digitalWrite(Dry, HIGH);
+}
 
+void dryOFF(){
+  digitalWrite(Dry, LOW);
 }
 
 void readMap(){
