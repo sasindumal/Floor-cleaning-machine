@@ -11,7 +11,8 @@
 
 #define Roller 8
 #define MOP 9
-#define Pump 10
+#define Pump 12
+#define Dry 11
 
 #define Usf_Echo A0
 #define Usf_Trig A1
@@ -25,6 +26,9 @@
 int motor_speed = 255;
 int autoModeOn = 0;
 char incomingByte;
+int pumpONduration = 1000;
+int pumpOFFduration = 2000;
+int pumpstate = 0;
 
 unsigned long prev_t = 0;
 unsigned long curr_t = 0;
@@ -43,6 +47,7 @@ void setup() {
   pinMode(Pump, OUTPUT);
   pinMode(MOP, OUTPUT);
   pinMode(Roller, OUTPUT);
+  pinMode(Dry, OUTPUT);
   initializeUS();
   Serial.begin(9600); 
 }
@@ -54,22 +59,14 @@ void loop()
   switch(autoModeOn)
   {
     case 0:
-    while(autoModeOn == 0)
-    {
-      manualMode();     
-    }
+    manualMode();   
     break;
-    
+
     case 1 :
-    while(autoModeOn == 1)
-    {
-      automaticMode();     
-    }
+    automaticMode();     
     break;
-    
     delay(500);
   }
-
 }
 
 
@@ -185,6 +182,7 @@ void manualMode()
   if (Serial.available() > 0)   //check if any data is available
   {
     incomingByte = Serial.read();   //read incoming data
+    Serial.println(incomingByte);
   }
 
   switch(incomingByte)    //based on received character execute respective commands
@@ -195,73 +193,119 @@ void manualMode()
     break;
 
     case 'F':
-    move_f();
-    incomingByte='*';
+    Serial.println("Forward");
+    digitalWrite(L1, LOW); 
+    analogWrite(L2, motor_speed);
+    analogWrite(R1, motor_speed);
+    digitalWrite(R2, LOW);
+    break;
+
+    case 'f':
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
     break;
     
     case 'B':
-    move_b();
-    incomingByte='*';
+    Serial.println("Backward");
+    digitalWrite(L2, LOW); 
+    analogWrite(L1, motor_speed);
+    analogWrite(R2, motor_speed);
+    digitalWrite(R1, LOW);
+    break;
+    
+    case 'b':
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
     break;
     
     case 'L':
-    turn_l();
-    incomingByte='*';
+    Serial.println("Left");
+    analogWrite(L1, motor_speed); 
+    digitalWrite(L2, LOW);
+    analogWrite(R1, motor_speed);
+    digitalWrite(R2, LOW);
     break;
     
+    case 'l':
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
+    break;
+
     case 'R':
-    turn_r();
-    incomingByte='*';
+    Serial.println("Right");
+    digitalWrite(L1, LOW); 
+    analogWrite(L2, motor_speed);
+    digitalWrite(R1, LOW);
+    analogWrite(R2, motor_speed);
     break;
     
+    case 'r':
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
+    break;
+
     case 'S':
-    move_s();
-    incomingByte='*';
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
     break;
     
-    case 'P':
+    case 'N':
     digitalWrite(Pump, HIGH);
-    incomingByte='*';
     break;
     
-    case 'p':
-    digitalWrite(Pump, LOW); 
-    incomingByte='*';
+    case 'n':
+    digitalWrite(Pump, LOW);
     break;
-    
+
     case 'M':
     digitalWrite(MOP, HIGH);
-    incomingByte='*';
     break;
     
     case 'm':
     digitalWrite(MOP, LOW); 
-    incomingByte='*';
     break;
 
     case 'K':
     digitalWrite(Roller, HIGH);
-    incomingByte='*';
     break;
     
     case 'k':
     digitalWrite(Roller, LOW); 
-    incomingByte='*';
+    break;
+
+    case 'Q':
+    digitalWrite(Dry, HIGH);
+    break;
+    
+    case 'q':
+    digitalWrite(Dry, LOW); 
     break;
 
     case '1':
     motor_speed = 155;
-    incomingByte='*';
     break;
     
     case '2':
     motor_speed = 205;
-    incomingByte='*';
     break;
     
     case '3':
     motor_speed = 255;
-    incomingByte='*';
     break;
     
     delay(5000);
@@ -277,6 +321,9 @@ void move_s() {
   digitalWrite(L2, LOW);
   digitalWrite(R1, LOW);
   digitalWrite(R2, LOW);
+  digitalWrite(Roller, LOW);
+  digitalWrite(MOP, LOW);
+  digitalWrite(Dry, LOW);
 } 
   
 void move_f() {
@@ -284,7 +331,10 @@ void move_f() {
   digitalWrite(L1, LOW); 
   analogWrite(L2, motor_speed);
   analogWrite(R1, motor_speed);
-  digitalWrite(R2, LOW);   
+  digitalWrite(R2, LOW);
+  digitalWrite(Roller, HIGH);
+  digitalWrite(MOP, HIGH);
+  digitalWrite(Dry, HIGH);                                                                                                                                                                            
 }
 
 void move_b() {
@@ -292,7 +342,10 @@ void move_b() {
   digitalWrite(L2, LOW); 
   analogWrite(L1, motor_speed);
   analogWrite(R2, motor_speed);
-  digitalWrite(R1, LOW);   
+  digitalWrite(R1, LOW); 
+  digitalWrite(Roller, LOW);
+  digitalWrite(MOP, LOW);
+  digitalWrite(Dry, LOW);  
 }
 
 void move_oneblock() {
@@ -300,7 +353,10 @@ void move_oneblock() {
     digitalWrite(L1, LOW); 
     analogWrite(L2, motor_speed);
     analogWrite(R1, motor_speed);
-    digitalWrite(R2, LOW);      
+    digitalWrite(R2, LOW);
+    digitalWrite(Roller, LOW);
+    digitalWrite(MOP, LOW);
+    digitalWrite(Dry, LOW);      
     delay(unit_TV);
     move_s();
 }
@@ -310,7 +366,10 @@ void turn_r() {
   digitalWrite(L1, LOW); 
   analogWrite(L2, motor_speed);
   digitalWrite(R1, LOW);
-  analogWrite(R2, motor_speed);   
+  analogWrite(R2, motor_speed);
+  digitalWrite(Roller, LOW);
+  digitalWrite(MOP, LOW);
+  digitalWrite(Dry, LOW);   
   delay(2000);
 } 
 
@@ -320,6 +379,9 @@ void turn_l() {
   digitalWrite(L2, LOW);
   analogWrite(R1, motor_speed);
   digitalWrite(R2, LOW); 
+  digitalWrite(Roller, LOW);
+  digitalWrite(MOP, LOW);
+  digitalWrite(Dry, LOW);
   delay(2000);
 }
 
@@ -444,9 +506,8 @@ void checkautomode(){
     autoModeOn = 1;
     incomingByte='*';
   }
-
-
 }
+
 
 void readMap(){
 //  #define fmap "C:\\tempExtract\\fmap.data"
