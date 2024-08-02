@@ -41,6 +41,7 @@ A mapping algorithm is a code that maps an entire unknown room. It starts with t
 
 <img src="https://github.com/PatelVatsalB21/Ultrasonic-SLAM/blob/main/Images/Mapping_2.png"/>
 
+
 Here we are using a test case to demonstrate the working of the mapping algorithm. As shown above, the room has obstacles on four corners and this test case covers most of the critical edge cases. The car starts mapping from the top right corner of the room and maps till the end of the room in 7 iterations. Here we use 3 columns in the array to store values from each iteration as l,b and r. As shown b is used to store regular horizontal reading while l and r are used for storing extra spaces in the left and right directions of each iteration if available. Hence l and r are 0 for iterations 1,2,6,7 while they are measurable for 3,4,5. 
 
 ### Result of Mapping

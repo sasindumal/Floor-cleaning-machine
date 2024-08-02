@@ -178,123 +178,143 @@ void automaticMode() {
 }
 
 
-
 void manualMode()
 {
-  if (Serial.available() > 0) { // Check if any data is available
-    incomingByte = Serial.read(); // Read incoming data
+  if (Serial.available() > 0)   //check if any data is available
+  {
+    incomingByte = Serial.read();   //read incoming data
     Serial.println(incomingByte);
   }
 
-  switch (incomingByte) { // Based on received character, execute respective commands
+  pump();
+
+
+  switch(incomingByte)    //based on received character execute respective commands
+  {
     case 'A':
-      autoModeOn = 1;
-      incomingByte = '*';
-      break;
+    autoModeOn = 1;
+    incomingByte='*';
+    break;
 
     case 'F':
-      Serial.println("Forward");
-      digitalWrite(L1, LOW);
-      analogWrite(L2, motor_speed);
-      analogWrite(R1, motor_speed);
-      digitalWrite(R2, LOW);
-      break;
+    Serial.println("Forward");
+    digitalWrite(L1, LOW); 
+    analogWrite(L2, motor_speed);
+    analogWrite(R1, motor_speed);
+    digitalWrite(R2, LOW);
+    break;
 
     case 'f':
-    case 'S':
-    case 'b':
-    case 'l':
-    case 'r':
-      Serial.println("Stop");
-      digitalWrite(L1, LOW);
-      digitalWrite(L2, LOW);
-      digitalWrite(R1, LOW);
-      digitalWrite(R2, LOW);
-      break;
-
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
+    break;
+    
     case 'B':
-      Serial.println("Backward");
-      digitalWrite(L2, LOW);
-      analogWrite(L1, motor_speed);
-      analogWrite(R2, motor_speed);
-      digitalWrite(R1, LOW);
-      break;
-
+    Serial.println("Backward");
+    digitalWrite(L2, LOW); 
+    analogWrite(L1, motor_speed);
+    analogWrite(R2, motor_speed);
+    digitalWrite(R1, LOW);
+    break;
+    
+    case 'b':
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
+    break;
+    
     case 'L':
-      Serial.println("Left");
-      analogWrite(L1, motor_speed);
-      digitalWrite(L2, LOW);
-      analogWrite(R1, motor_speed);
-      digitalWrite(R2, LOW);
-      break;
+    Serial.println("Left");
+    analogWrite(L1, motor_speed); 
+    digitalWrite(L2, LOW);
+    analogWrite(R1, motor_speed);
+    digitalWrite(R2, LOW);
+    break;
+    
+    case 'l':
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
+    break;
 
     case 'R':
-      Serial.println("Right");
-      digitalWrite(L1, LOW);
-      analogWrite(L2, motor_speed);
-      digitalWrite(R1, LOW);
-      analogWrite(R2, motor_speed);
-      break;
+    Serial.println("Right");
+    digitalWrite(L1, LOW); 
+    analogWrite(L2, motor_speed);
+    digitalWrite(R1, LOW);
+    analogWrite(R2, motor_speed);
+    break;
+    
+    case 'r':
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
+    break;
 
+    case 'S':
+    Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
+    break;
+    
     case 'N': // Start the pump on-off cycle
-      pumpState = true;
-      previousMillis = millis(); // Initialize the timer
-      break;
+    pumpState = true;
+    previousMillis = millis(); // Initialize the timer
+    break;
 
     case 'n': // Stop the pump on-off cycle
-      pumpState = false;
-      digitalWrite(pumpPin, LOW); // Ensure the pump is off
-      break;
+    pumpState = false;
+    digitalWrite(Pump, LOW); // Ensure the pump is off
+    break;
 
     case 'M':
-      digitalWrite(MOP, HIGH);
-      break;
-
+    digitalWrite(MOP, HIGH);
+    break;
+    
     case 'm':
-      digitalWrite(MOP, LOW);
-      break;
+    digitalWrite(MOP, LOW); 
+    break;
 
     case 'K':
-      digitalWrite(Roller, HIGH);
-      break;
-
+    digitalWrite(Roller, HIGH);
+    break;
+    
     case 'k':
-      digitalWrite(Roller, LOW);
-      break;
+    digitalWrite(Roller, LOW); 
+    break;
 
     case 'Q':
-      digitalWrite(Dry, HIGH);
-      break;
-
+    digitalWrite(Dry, HIGH);
+    break;
+    
     case 'q':
-      digitalWrite(Dry, LOW);
-      break;
+    digitalWrite(Dry, LOW); 
+    break;
 
     case '1':
-      motor_speed = 155;
-      break;
-
+    motor_speed = 155;
+    break;
+    
     case '2':
-      motor_speed = 205;
-      break;
-
+    motor_speed = 205;
+    break;
+    
     case '3':
-      motor_speed = 255;
-      break;
-
+    motor_speed = 255;
+    break;
+    
     delay(5000);
-  }
-
-  // Handle the pump on-off cycle
-  if (pumpState) {
-    unsigned long currentMillis = millis();
-    if (digitalRead(pumpPin) == HIGH && currentMillis - previousMillis >= pumpOnTime) {
-      digitalWrite(pumpPin, LOW); // Turn off the pump
-      previousMillis = currentMillis; // Reset the timer
-    } else if (digitalRead(pumpPin) == LOW && currentMillis - previousMillis >= pumpOffTime) {
-      digitalWrite(pumpPin, HIGH); // Turn on the pump
-      previousMillis = currentMillis; // Reset the timer
-    }
   }
 }
 
@@ -310,6 +330,8 @@ void move_s() {
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
+  pumpState = false;
+  pump();
 } 
   
 void move_f() {
@@ -320,7 +342,9 @@ void move_f() {
   digitalWrite(R2, LOW);
   digitalWrite(Roller, HIGH);
   digitalWrite(MOP, HIGH);
-  digitalWrite(Dry, HIGH);                                                                                                                                                                            
+  digitalWrite(Dry, HIGH);
+  pumpState = true;
+  pump();                                                                                                                                                                            
 }
 
 void move_b() {
@@ -331,7 +355,9 @@ void move_b() {
   digitalWrite(R1, LOW); 
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
-  digitalWrite(Dry, LOW);  
+  digitalWrite(Dry, LOW);
+  pumpState = false;
+  pump();  
 }
 
 void move_oneblock() {
@@ -342,7 +368,9 @@ void move_oneblock() {
     digitalWrite(R2, LOW);
     digitalWrite(Roller, LOW);
     digitalWrite(MOP, LOW);
-    digitalWrite(Dry, LOW);      
+    digitalWrite(Dry, LOW);
+    pumpState = false;
+    pump();     
     delay(unit_TV);
     move_s();
 }
@@ -355,7 +383,9 @@ void turn_r() {
   analogWrite(R2, motor_speed);
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
-  digitalWrite(Dry, LOW);   
+  digitalWrite(Dry, LOW);
+  pumpState = false;
+  pump();   
   delay(2000);
 } 
 
@@ -365,9 +395,11 @@ void turn_l() {
   digitalWrite(L2, LOW);
   analogWrite(R1, motor_speed);
   digitalWrite(R2, LOW); 
-  digitalWrite(Roller, LOW);
+  ddigitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
+  pumpState = false;
+  pump();
   delay(2000);
 }
 
@@ -492,6 +524,21 @@ void checkautomode(){
     autoModeOn = 1;
     incomingByte='*';
   }
+}
+
+void pump(){
+  if (pumpState) {
+    unsigned long currentMillis = millis();
+    if (digitalRead(pumpPin) == HIGH && currentMillis - previousMillis >= pumpOnTime) {
+        digitalWrite(pumpPin, LOW); // Turn off the pump      previousMillis = currentMillis; // Reset the timer
+     } else if (digitalRead(pumpPin) == LOW && currentMillis - previousMillis >= pumpOffTime) {
+       digitalWrite(pumpPin, HIGH); // Turn on the pump
+        previousMillis = currentMillis; // Reset the timer
+     }
+ } else if (!pumpstate){
+  digitalWrite(Pump, LOW);
+ }
+
 }
 
 
