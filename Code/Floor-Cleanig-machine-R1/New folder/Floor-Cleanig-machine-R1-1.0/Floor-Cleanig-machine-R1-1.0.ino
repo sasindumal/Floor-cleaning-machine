@@ -394,7 +394,7 @@ void turn_l() {
   digitalWrite(L2, LOW);
   analogWrite(R1, motor_speed);
   digitalWrite(R2, LOW); 
-  ddigitalWrite(Roller, LOW);
+  digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
   pumpState = false;
@@ -528,13 +528,13 @@ void checkautomode(){
 void pump(){
   if (pumpState) {
     unsigned long currentMillis = millis();
-    if (digitalRead(pumpPin) == HIGH && currentMillis - previousMillis >= pumpOnTime) {
-        digitalWrite(pumpPin, LOW); // Turn off the pump      previousMillis = currentMillis; // Reset the timer
-     } else if (digitalRead(pumpPin) == LOW && currentMillis - previousMillis >= pumpOffTime) {
-       digitalWrite(pumpPin, HIGH); // Turn on the pump
+    if (digitalRead(Pump) == HIGH && currentMillis - previousMillis >= pumpOnTime) {
+        digitalWrite(Pump, LOW); // Turn off the pump      previousMillis = currentMillis; // Reset the timer
+     } else if (digitalRead(Pump) == LOW && currentMillis - previousMillis >= pumpOffTime) {
+       digitalWrite(Pump, HIGH); // Turn on the pump
         previousMillis = currentMillis; // Reset the timer
      }
- } else if (!pumpstate){
+ } else if (!pumpState){
   digitalWrite(Pump, LOW);
   }
 }
