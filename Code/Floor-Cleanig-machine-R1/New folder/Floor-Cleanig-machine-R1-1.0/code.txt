@@ -84,15 +84,9 @@ void automaticMode() {
       if(i%2 != 0){
         prev_t = millis();
         while(readUsf() > 15){
+          checkautomode();
           Serial.println("Inside 1");
-          incomingByte = Serial.read();   //read incoming data
-          if (incomingByte == 'X'){
-            autoModeOn = 0;
-            incomingByte='*';
-            break;
-          }
           move_f();
-          
         }
       } else {
         if (i % 4  != 0){
@@ -102,15 +96,9 @@ void automaticMode() {
             turn_l();
             prev_t = millis();
             while(readUsf() > 10){
+              checkautomode();
               Serial.println("Inside 2");
               move_f();
-              incomingByte = Serial.read();   //read incoming data
-              if (incomingByte == 'X'){
-                autoModeOn = 0;
-                incomingByte='*';
-                break;
-              }
-          break;
             }
             curr_t = millis();
 //            addReading(i);
@@ -118,11 +106,6 @@ void automaticMode() {
             turn_r();
             Serial.println("Inside 3");
             move_f();
-            incomingByte = Serial.read();   //read incoming data
-            if (incomingByte == 'X'){
-              autoModeOn = 0;
-              incomingByte='*';
-            }
             delay(curr_t - prev_t);
           }
           turn_r();
@@ -134,14 +117,9 @@ void automaticMode() {
             turn_r();
             prev_t = millis();
             while(readUsf() > 10){
+              checkautomode();
               Serial.println("Inside 4");
               move_f();
-              incomingByte = Serial.read();   //read incoming data
-              if (incomingByte == 'X'){
-                autoModeOn = 0;
-                incomingByte='*';
-                break;
-              }
             }
             curr_t = millis();
 //            addReading(i);
@@ -149,11 +127,6 @@ void automaticMode() {
             turn_l();
             Serial.println("Inside 5");
             move_f();
-            incomingByte = Serial.read();   //read incoming data
-            if (incomingByte == 'X'){
-              autoModeOn = 0;
-              incomingByte='*';
-            }
             delay(curr_t - prev_t);
           }
           turn_l();
@@ -168,11 +141,6 @@ void automaticMode() {
       i++;
       if(look_r() > 20){
         turn_r();
-        incomingByte = Serial.read();   //read incoming data
-        if (incomingByte == 'X'){
-          autoModeOn = 0;
-          incomingByte='*';
-        }
       }
     }
 }
@@ -186,9 +154,6 @@ void manualMode()
     Serial.println(incomingByte);
   }
   pump();
-
-  pump();
-
 
   switch(incomingByte)    //based on received character execute respective commands
   {
@@ -269,16 +234,6 @@ void manualMode()
     digitalWrite(R2, LOW);
     break;
     
-<<<<<<< Updated upstream
-    case 'N': // Start the pump on-off cycle
-    pumpState = true;
-    previousMillis = millis(); // Initialize the timer
-    break;
-
-    case 'n': // Stop the pump on-off cycle
-    pumpState = false;
-    digitalWrite(Pump, LOW); // Ensure the pump is off
-=======
     case 'N':
     pumpState = true;
     previousMillis = millis();
@@ -287,7 +242,6 @@ void manualMode()
     case 'n':
     pumpState = false;
     digitalWrite(Pump, LOW);
->>>>>>> Stashed changes
     break;
 
     case 'M':
@@ -369,11 +323,7 @@ void move_b() {
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
   pumpState = false;
-<<<<<<< Updated upstream
-  pump();  
-=======
   pump();    
->>>>>>> Stashed changes
 }
 
 void move_oneblock() {
@@ -381,19 +331,10 @@ void move_oneblock() {
     digitalWrite(L1, LOW); 
     analogWrite(L2, motor_speed);
     analogWrite(R1, motor_speed);
-<<<<<<< Updated upstream
-    digitalWrite(R2, LOW);
-    digitalWrite(Roller, LOW);
-    digitalWrite(MOP, LOW);
-    digitalWrite(Dry, LOW);
-    pumpState = false;
-    pump();     
-=======
     digitalWrite(R2, HIGH);
     digitalWrite(Roller, HIGH);
     digitalWrite(MOP, HIGH);
     digitalWrite(Dry, HIGH);      
->>>>>>> Stashed changes
     delay(unit_TV);
     move_s();
 }
@@ -406,15 +347,9 @@ void turn_r() {
   analogWrite(R2, motor_speed);
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
-<<<<<<< Updated upstream
-  digitalWrite(Dry, LOW);
-  pumpState = false;
-  pump();   
-=======
   digitalWrite(Dry, LOW); 
   pumpState = false;
   pump();  
->>>>>>> Stashed changes
   delay(2000);
 } 
 
@@ -424,7 +359,7 @@ void turn_l() {
   digitalWrite(L2, LOW);
   analogWrite(R1, motor_speed);
   digitalWrite(R2, LOW); 
-  ddigitalWrite(Roller, LOW);
+  digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
   pumpState = false;
@@ -558,17 +493,6 @@ void checkautomode(){
 void pump(){
   if (pumpState) {
     unsigned long currentMillis = millis();
-<<<<<<< Updated upstream
-    if (digitalRead(pumpPin) == HIGH && currentMillis - previousMillis >= pumpOnTime) {
-        digitalWrite(pumpPin, LOW); // Turn off the pump      previousMillis = currentMillis; // Reset the timer
-     } else if (digitalRead(pumpPin) == LOW && currentMillis - previousMillis >= pumpOffTime) {
-       digitalWrite(pumpPin, HIGH); // Turn on the pump
-        previousMillis = currentMillis; // Reset the timer
-     }
- } else if (!pumpstate){
-  digitalWrite(Pump, LOW);
- }
-=======
     if (digitalRead(Pump) == HIGH && currentMillis - previousMillis >= pumpOnTime) {
       digitalWrite(Pump, LOW); // Turn off the pump
       previousMillis = currentMillis; // Reset the timer
@@ -577,7 +501,6 @@ void pump(){
       previousMillis = currentMillis; // Reset the timer
     }
   }
->>>>>>> Stashed changes
 
 }
 

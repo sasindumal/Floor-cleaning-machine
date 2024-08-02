@@ -43,6 +43,12 @@ void setup() {
   pinMode(Pump, OUTPUT);
   pinMode(MOP, OUTPUT);
   pinMode(Roller, OUTPUT);
+  pinMode(L1, OUTPUT);
+  pinMode(L2, OUTPUT);
+  pinMode(LENB, OUTPUT);
+  pinMode(R1, OUTPUT);
+  pinMode(R2, OUTPUT);
+  pinMode(RENB, OUTPUT);
   initializeUS();
   Serial.begin(9600); 
 }
