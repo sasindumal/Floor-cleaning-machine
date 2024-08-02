@@ -33,10 +33,6 @@ void setup() {
   pinMode(Usl_Echo, INPUT);
   pinMode(Usr_Trig, OUTPUT);
   pinMode(Usr_Echo, INPUT);
-  pinMode(Usr_Trig, OUTPUT);
-  pinMode(Usr_Echo, INPUT);
-  pinMode(Usr_Trig, OUTPUT);
-  pinMode(Usr_Echo, INPUT);
 
   pinMode(L1, OUTPUT);
   pinMode(L2, OUTPUT);
@@ -44,11 +40,13 @@ void setup() {
   pinMode(R1, OUTPUT);
   pinMode(R2, OUTPUT);
   pinMode(RENB, OUTPUT);
+  pinMode(Roller, OUTPUT);
+  pinMode(MOP, OUTPUT);
 }
 
 void loop() {
 
-   long distanceLeft = readUltrasonicDistance(Usr_Trig, Usr_Echo);
+   long distanceLeft = readUltrasonicDistance(Usf_Trig, Usf_Echo);
 
   if (distanceLeft > 30) {
     // Move forward if no obstacle
@@ -60,12 +58,36 @@ void loop() {
   } else {
     // Stop the robot if an obstacle is detected
     digitalWrite(L1, LOW);
-    digitalWrite(L2, LOW);;m n,koipuhygfxdfcvbml.
+    digitalWrite(L2, LOW);
     
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
     
   }
+
+    long distanceL = readUltrasonicDistance(Usl_Trig, Usl_Echo);
+
+  if (distanceL > 30) {
+    // Move forward if no obstacle
+    digitalWrite(Roller, HIGH);   
+    
+  } else {
+    // Stop the robot if an obstacle is detected
+   digitalWrite(Roller, LOW);   
+  }
+
+  long distanceR = readUltrasonicDistance(Usr_Trig, Usr_Echo);
+
+  if (distanceL > 30) {
+    // Move forward if no obstacle
+    digitalWrite(MOP, HIGH);   
+    
+  } else {
+    // Stop the robot if an obstacle is detected
+   digitalWrite(MOP, LOW);   
+  }
+
+
 /*
   // Read and print distance from left sensor
  

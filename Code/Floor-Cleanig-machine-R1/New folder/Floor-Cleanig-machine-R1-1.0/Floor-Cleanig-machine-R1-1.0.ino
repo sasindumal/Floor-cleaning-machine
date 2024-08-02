@@ -27,9 +27,9 @@ int motor_speed = 255;
 int autoModeOn = 0;
 char incomingByte;
 bool pumpState = false;
-unsigned long previousMillis = 0;
 const long pumpOnTime = 500; // Pump on duration in milliseconds
 const long pumpOffTime = 2000; // Pump off duration in milliseconds
+int obstacledistance = 30;
 
 unsigned long prev_t = 0;
 unsigned long curr_t = 0;
@@ -73,44 +73,48 @@ void loop()
 
 void automaticMode() {
 
-  checkautomode();
+  incomingByte = Serial.read();   //read incoming data
+  if (incomingByte == 'X')
+  {autoModeOn = 0;
+  incomingByte='*';
+  } else {
 
   Serial.println("I is: ");
   Serial.print(i);
   l=0;
   b=0;
   r=0;
-  if(readUsf() > 15) {
+  if(readUsf() > obstacledistance) {
       if(i%2 != 0){
         prev_t = millis();
-        while(readUsf() > 15){
-          Serial.println("Inside 1");
+        while(readUsf() > obstacledistance){
+
           incomingByte = Serial.read();   //read incoming data
-          if (incomingByte == 'X'){
-            autoModeOn = 0;
-            incomingByte='*';
-            break;
-          }
+          if (incomingByte == 'X')
+          {autoModeOn = 0;
+          incomingByte='*';
+          break;}
+
+          Serial.println("Inside 1");
           move_f();
-          
         }
       } else {
         if (i % 4  != 0){
           turn_r();
           move_oneblock();
-          if(look_l() > 20){
+          if(look_l() > obstacledistance){
             turn_l();
             prev_t = millis();
-            while(readUsf() > 10){
+            while(readUsf() > obstacledistance){
+
+              incomingByte = Serial.read();   //read incoming data
+              if (incomingByte == 'X')
+              {autoModeOn = 0;
+              incomingByte='*';
+              break;}
+
               Serial.println("Inside 2");
               move_f();
-              incomingByte = Serial.read();   //read incoming data
-              if (incomingByte == 'X'){
-                autoModeOn = 0;
-                incomingByte='*';
-                break;
-              }
-          break;
             }
             curr_t = millis();
 //            addReading(i);
@@ -118,11 +122,6 @@ void automaticMode() {
             turn_r();
             Serial.println("Inside 3");
             move_f();
-            incomingByte = Serial.read();   //read incoming data
-            if (incomingByte == 'X'){
-              autoModeOn = 0;
-              incomingByte='*';
-            }
             delay(curr_t - prev_t);
           }
           turn_r();
@@ -130,18 +129,19 @@ void automaticMode() {
         } else {
           turn_l();
           move_oneblock();
-          if(look_r()> 20){
+          if(look_r()> obstacledistance){
             turn_r();
             prev_t = millis();
-            while(readUsf() > 10){
+            while(readUsf() > obstacledistance){
+
+              incomingByte = Serial.read();   //read incoming data
+              if (incomingByte == 'X')
+              {autoModeOn = 0;
+              incomingByte='*';
+              break;}
+
               Serial.println("Inside 4");
               move_f();
-              incomingByte = Serial.read();   //read incoming data
-              if (incomingByte == 'X'){
-                autoModeOn = 0;
-                incomingByte='*';
-                break;
-              }
             }
             curr_t = millis();
 //            addReading(i);
@@ -149,11 +149,6 @@ void automaticMode() {
             turn_l();
             Serial.println("Inside 5");
             move_f();
-            incomingByte = Serial.read();   //read incoming data
-            if (incomingByte == 'X'){
-              autoModeOn = 0;
-              incomingByte='*';
-            }
             delay(curr_t - prev_t);
           }
           turn_l();
@@ -166,15 +161,11 @@ void automaticMode() {
       b = (curr_t - prev_t)/unit_TH;
 //      addReading(i);
       i++;
-      if(look_r() > 20){
+      if(look_r() > obstacledistance){
         turn_r();
-        incomingByte = Serial.read();   //read incoming data
-        if (incomingByte == 'X'){
-          autoModeOn = 0;
-          incomingByte='*';
-        }
       }
     }
+  }
 }
 
 
@@ -185,7 +176,9 @@ void manualMode()
     incomingByte = Serial.read();   //read incoming data
     Serial.println(incomingByte);
   }
-  pump();
+  if (pumpState){
+    pump();
+  }
 
 
   switch(incomingByte)    //based on received character execute respective commands
@@ -269,7 +262,6 @@ void manualMode()
 
     case 'N':
     pumpState = true;
-    previousMillis = millis();
     break;
     
     case 'n':
@@ -329,8 +321,6 @@ void move_s() {
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
-  pumpState = false;
-  pump();
 } 
   
 void move_f() {
@@ -342,7 +332,6 @@ void move_f() {
   digitalWrite(Roller, HIGH);
   digitalWrite(MOP, HIGH);
   digitalWrite(Dry, HIGH);
-  pumpState = true;
   pump();                                                                                                                                                                            
 }
 
@@ -355,8 +344,6 @@ void move_b() {
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
-  pumpState = false;
-  pump();    
 }
 
 void move_oneblock() {
@@ -365,10 +352,9 @@ void move_oneblock() {
     analogWrite(L2, motor_speed);
     analogWrite(R1, motor_speed);
     digitalWrite(R2, LOW);
-    digitalWrite(Roller, LOW);
-    digitalWrite(MOP, LOW);
-    digitalWrite(Dry, LOW);
-    pumpState = false;
+    digitalWrite(Roller, HIGH);
+    digitalWrite(MOP, HIGH);
+    digitalWrite(Dry, HIGH);
     pump();     
     delay(unit_TV);
     move_s();
@@ -383,8 +369,6 @@ void turn_r() {
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
-  pumpState = false;
-  pump();   
   delay(2000);
 } 
 
@@ -397,8 +381,6 @@ void turn_l() {
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
-  pumpState = false;
-  pump();
   delay(2000);
 }
 
@@ -511,33 +493,13 @@ void writeMap(){
   fclose(f);
 }
 
-void checkautomode(){
-  
-  incomingByte = Serial.read();   //read incoming data
-
-  if (incomingByte == 'X')
-  {
-    autoModeOn = 0;
-    incomingByte='*';
-  } else if (incomingByte == 'A'){
-    autoModeOn = 1;
-    incomingByte='*';
-  }
-}
 
 void pump(){
-  if (pumpState) {
-    unsigned long currentMillis = millis();
-    if (digitalRead(Pump) == HIGH && currentMillis - previousMillis >= pumpOnTime) {
-        digitalWrite(Pump, LOW); // Turn off the pump      previousMillis = currentMillis; // Reset the timer
-     } else if (digitalRead(Pump) == LOW && currentMillis - previousMillis >= pumpOffTime) {
-       digitalWrite(Pump, HIGH); // Turn on the pump
-        previousMillis = currentMillis; // Reset the timer
-     }
- } else if (!pumpState){
+  digitalWrite(Pump, HIGH);
+  delay(pumpOnTime);
   digitalWrite(Pump, LOW);
+  delay (pumpOffTime);
   }
-}
 
 
 void readMap(){
