@@ -187,8 +187,6 @@ void manualMode()
   }
   pump();
 
-  pump();
-
 
   switch(incomingByte)    //based on received character execute respective commands
   {
@@ -269,7 +267,6 @@ void manualMode()
     digitalWrite(R2, LOW);
     break;
     
-<<<<<<< Updated upstream
     case 'N': // Start the pump on-off cycle
     pumpState = true;
     previousMillis = millis(); // Initialize the timer
@@ -278,7 +275,7 @@ void manualMode()
     case 'n': // Stop the pump on-off cycle
     pumpState = false;
     digitalWrite(Pump, LOW); // Ensure the pump is off
-=======
+
     case 'N':
     pumpState = true;
     previousMillis = millis();
@@ -287,7 +284,6 @@ void manualMode()
     case 'n':
     pumpState = false;
     digitalWrite(Pump, LOW);
->>>>>>> Stashed changes
     break;
 
     case 'M':
@@ -369,11 +365,7 @@ void move_b() {
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
   pumpState = false;
-<<<<<<< Updated upstream
-  pump();  
-=======
   pump();    
->>>>>>> Stashed changes
 }
 
 void move_oneblock() {
@@ -381,19 +373,12 @@ void move_oneblock() {
     digitalWrite(L1, LOW); 
     analogWrite(L2, motor_speed);
     analogWrite(R1, motor_speed);
-<<<<<<< Updated upstream
     digitalWrite(R2, LOW);
     digitalWrite(Roller, LOW);
     digitalWrite(MOP, LOW);
     digitalWrite(Dry, LOW);
     pumpState = false;
     pump();     
-=======
-    digitalWrite(R2, HIGH);
-    digitalWrite(Roller, HIGH);
-    digitalWrite(MOP, HIGH);
-    digitalWrite(Dry, HIGH);      
->>>>>>> Stashed changes
     delay(unit_TV);
     move_s();
 }
@@ -406,15 +391,9 @@ void turn_r() {
   analogWrite(R2, motor_speed);
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
-<<<<<<< Updated upstream
   digitalWrite(Dry, LOW);
   pumpState = false;
   pump();   
-=======
-  digitalWrite(Dry, LOW); 
-  pumpState = false;
-  pump();  
->>>>>>> Stashed changes
   delay(2000);
 } 
 
@@ -558,7 +537,6 @@ void checkautomode(){
 void pump(){
   if (pumpState) {
     unsigned long currentMillis = millis();
-<<<<<<< Updated upstream
     if (digitalRead(pumpPin) == HIGH && currentMillis - previousMillis >= pumpOnTime) {
         digitalWrite(pumpPin, LOW); // Turn off the pump      previousMillis = currentMillis; // Reset the timer
      } else if (digitalRead(pumpPin) == LOW && currentMillis - previousMillis >= pumpOffTime) {
@@ -567,18 +545,7 @@ void pump(){
      }
  } else if (!pumpstate){
   digitalWrite(Pump, LOW);
- }
-=======
-    if (digitalRead(Pump) == HIGH && currentMillis - previousMillis >= pumpOnTime) {
-      digitalWrite(Pump, LOW); // Turn off the pump
-      previousMillis = currentMillis; // Reset the timer
-    } else if (digitalRead(Pump) == LOW && currentMillis - previousMillis >= pumpOffTime) {
-      digitalWrite(Pump, HIGH); // Turn on the pump
-      previousMillis = currentMillis; // Reset the timer
-    }
   }
->>>>>>> Stashed changes
-
 }
 
 
