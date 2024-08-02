@@ -266,15 +266,6 @@ void manualMode()
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
     break;
-    
-    case 'N': // Start the pump on-off cycle
-    pumpState = true;
-    previousMillis = millis(); // Initialize the timer
-    break;
-
-    case 'n': // Stop the pump on-off cycle
-    pumpState = false;
-    digitalWrite(Pump, LOW); // Ensure the pump is off
 
     case 'N':
     pumpState = true;
