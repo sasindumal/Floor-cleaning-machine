@@ -24,7 +24,7 @@
 #define Usr_Trig A5
 
 int motor_speed = 255;
-int autoModeOn = 1;
+int autoModeOn = 0;
 char incomingByte;
 bool pumpState = false;
 const long pumpOnTime = 500; 
@@ -70,6 +70,8 @@ void loop()
 
 void automaticMode() {
 
+  motor_speed = 255;
+
   if (Serial.available() > 0)   //check if any data is available
   {
     incomingByte = Serial.read();   //read incoming data
@@ -112,6 +114,12 @@ void automaticMode() {
 
 void manualMode()
 {
+  Serial.println("Stop");
+    digitalWrite(L1, LOW); 
+    digitalWrite(L2, LOW);
+    digitalWrite(R1, LOW);
+    digitalWrite(R2, LOW);
+
   if (Serial.available() > 0)   //check if any data is available
   {
     incomingByte = Serial.read();   //read incoming data
@@ -202,10 +210,12 @@ void manualMode()
     break;
 
     case 'N':
+    Serial.println("Pump ON");
     pumpState = true;
     break;
     
     case 'n':
+    Serial.println("Pump OFF");
     pumpState = false;
     digitalWrite(Pump, LOW);
     break;
