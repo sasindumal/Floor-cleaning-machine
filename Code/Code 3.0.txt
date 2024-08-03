@@ -24,7 +24,7 @@
 #define Usr_Trig A5
 
 int motor_speed = 255;
-int autoModeOn = 1;
+int autoModeOn = 0;
 char incomingByte;
 bool pumpState = false;
 const long pumpOnTime = 500; 
@@ -64,6 +64,7 @@ void loop()
     case 1 :
     automaticMode();     
     break;
+    delay(100);
   }
 }
 
@@ -83,11 +84,9 @@ void automaticMode() {
   pred[0]= readUsf();
   pred[1]= readUsl();
   pred[2]= readUsr();
-   for (int i = 0; i < 3; i++) {
-        Serial.println(pred[i]);
-    }
+
   int prediction = predict(pred);
-  Serial.println(prediction);
+
   switch(prediction){
 
     case 0:
@@ -246,7 +245,7 @@ void manualMode()
     motor_speed = 255;
     break;
     
-    delay(500);
+    delay(5000);
   }
 }
 
@@ -286,6 +285,7 @@ void turn_r() {
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
+  delay(2000);
 } 
 
 void turn_l() {
@@ -297,59 +297,60 @@ void turn_l() {
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
+  delay(2000);
 }
 
 
-int readUsf() {
+float readUsf() {
   digitalWrite(Usf_Trig, LOW);
-  delayMicroseconds(20);
+  delayMicroseconds(200);
   digitalWrite(Usf_Trig, HIGH);
-  delayMicroseconds(100);
+  delayMicroseconds(1000);
   digitalWrite(Usf_Trig, LOW);
 //  distance= duration*0.034/2;
   int distance = microsecondsToCentimeters(pulseIn(Usf_Echo, HIGH));
   if(distance == 0)Serial.println(distance);
-  int reading;
+  float reading;
   if(distance < obstacledistance){
-    reading = 1.0;
+    float reading = 1.0;
   }else{
-    reading = 0;
+    float reading = 0;
   }
   return reading;
 }
 
-int readUsr() {
+float readUsr() {
   digitalWrite(Usr_Trig, LOW);
-  delayMicroseconds(20);
+  delayMicroseconds(200);
   digitalWrite(Usr_Trig, HIGH);
-  delayMicroseconds(100);
+  delayMicroseconds(1000);
   digitalWrite(Usr_Trig, LOW);
 //  distance= duration*0.034/2;
   int distance = microsecondsToCentimeters(pulseIn(Usr_Echo, HIGH));
   if(distance == 0)Serial.println(distance);
-  int reading;
+  float reading;
   if(distance < obstacledistance){
-    reading = 1.0;
+    float reading = 1.0;
   }else{
-    reading = 0;
+    float reading = 0;
   }
   return reading;
 }
 
-int readUsl() {
+float readUsl() {
   digitalWrite(Usl_Trig, LOW);
-  delayMicroseconds(20);
+  delayMicroseconds(200);
   digitalWrite(Usl_Trig, HIGH);
-  delayMicroseconds(100);
+  delayMicroseconds(1000);
   digitalWrite(Usl_Trig, LOW);
 //  distance= duration*0.034/2;
   int distance = microsecondsToCentimeters(pulseIn(Usl_Echo, HIGH));
   if(distance == 0)Serial.println(distance);
-  int reading;
+  float reading;
   if(distance < obstacledistance){
-    reading = 1.0;
+    float reading = 1.0;
   }else{
-    reading = 0;
+    float reading = 0;
   }
   return reading;
 }
