@@ -14,8 +14,11 @@
 #define Pump 12
 #define Dry 11
 
-#define Usf_Echo A0
-#define Usf_Trig A1
+#define Usfl_Echo A0
+#define Usfl_Trig A1
+
+#define Usfr_Echo 10
+#define Usfr_Trig 13
 
 #define Usl_Echo A2
 #define Usl_Trig A3
@@ -39,8 +42,12 @@ void setup() {
   pinMode(MOP, OUTPUT);
   pinMode(Roller, OUTPUT);
   pinMode(Dry, OUTPUT);
-  pinMode(Usf_Trig, OUTPUT); 
-  pinMode(Usf_Echo, INPUT);
+
+  pinMode(Usfl_Trig, OUTPUT); 
+  pinMode(Usfl_Echo, INPUT);
+
+  pinMode(Usfr_Trig, OUTPUT); 
+  pinMode(Usfr_Echo, INPUT);
 
   pinMode(Usl_Trig, OUTPUT); 
   pinMode(Usl_Echo, INPUT);
@@ -311,16 +318,27 @@ void turn_l() {
 
 
 int readUsf() {
-  digitalWrite(Usf_Trig, LOW);
+  digitalWrite(Usfl_Trig, LOW);
   delayMicroseconds(20);
-  digitalWrite(Usf_Trig, HIGH);
+  digitalWrite(Usfl_Trig, HIGH);
   delayMicroseconds(100);
-  digitalWrite(Usf_Trig, LOW);
+  digitalWrite(Usfl_Trig, LOW);
 //  distance= duration*0.034/2;
-  int distance = microsecondsToCentimeters(pulseIn(Usf_Echo, HIGH));
-  if(distance == 0)Serial.println(distance);
+  int distancel = microsecondsToCentimeters(pulseIn(Usfl_Echo, HIGH));
+
+  digitalWrite(Usfr_Trig, LOW);
+  delayMicroseconds(20);
+  digitalWrite(Usfr_Trig, HIGH);
+  delayMicroseconds(100);
+  digitalWrite(Usfr_Trig, LOW);
+//  distance= duration*0.034/2;
+  int distancer = microsecondsToCentimeters(pulseIn(Usfr_Echo, HIGH));
+
+  if(distancel == 0)Serial.println(distancel);
+  if(distancer == 0)Serial.println(distancer);
+
   int reading;
-  if(distance < obstacledistance){
+  if(distancel < obstacledistance || distancer < obstacledistance){
     reading = 1.0;
   }else{
     reading = 0;
