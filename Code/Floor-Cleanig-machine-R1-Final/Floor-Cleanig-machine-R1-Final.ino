@@ -33,6 +33,7 @@ bool pumpState = false;
 const long pumpOnTime = 200; 
 const long pumpOffTime = 2000; 
 int obstacledistance = 30;
+bool FpumpState = false;
 
 
 float pred[3];
@@ -126,7 +127,10 @@ void automaticMode() {
 
 
 void manualMode()
-{
+{ 
+  if (pumpState == true && FpumpState == true){
+    pump();
+    }
     
 
   if (Serial.available() > 0)   //check if any data is available
@@ -148,10 +152,7 @@ void manualMode()
     analogWrite(L2, motor_speed);
     analogWrite(R1, motor_speed);
     digitalWrite(R2, LOW);
-    if (pumpState){
-    pump();
-    }
-
+    FpumpState = true;
     break;
 
     case 'f':
@@ -160,6 +161,7 @@ void manualMode()
     digitalWrite(L2, LOW);
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
+    pumpState = false;
     break;
     
     case 'B':
@@ -168,6 +170,7 @@ void manualMode()
     analogWrite(L1, motor_speed);
     analogWrite(R2, motor_speed);
     digitalWrite(R1, LOW);
+    pumpState = false;
     break;
     
     case 'b':
@@ -176,6 +179,7 @@ void manualMode()
     digitalWrite(L2, LOW);
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
+    pumpState = false;
     break;
     
     case 'L':
@@ -184,6 +188,7 @@ void manualMode()
     digitalWrite(L2, LOW);
     analogWrite(R1, motor_speed);
     digitalWrite(R2, LOW);
+    pumpState = false;
     break;
     
     case 'l':
@@ -192,6 +197,7 @@ void manualMode()
     digitalWrite(L2, LOW);
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
+    pumpState = false;
     break;
 
     case 'R':
@@ -200,6 +206,7 @@ void manualMode()
     analogWrite(L2, motor_speed);
     digitalWrite(R1, LOW);
     analogWrite(R2, motor_speed);
+    pumpState = false;
     break;
     
     case 'r':
@@ -208,6 +215,7 @@ void manualMode()
     digitalWrite(L2, LOW);
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
+    pumpState = false;
     break;
 
     case 'S':
@@ -216,6 +224,7 @@ void manualMode()
     digitalWrite(L2, LOW);
     digitalWrite(R1, LOW);
     digitalWrite(R2, LOW);
+    pumpState = false;
     break;
 
     case 'N':
