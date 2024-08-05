@@ -30,7 +30,7 @@ int motor_speed = 255;
 int autoModeOn = 0;
 char incomingByte;
 bool pumpState = false;
-const long pumpOnTime = 500; 
+const long pumpOnTime = 200; 
 const long pumpOffTime = 2000; 
 int obstacledistance = 30;
 
@@ -85,7 +85,13 @@ void automaticMode() {
     Serial.println(incomingByte);
 
     if (incomingByte == 'X'){
+      Serial.println("Stop");
+      digitalWrite(L1, LOW); 
+      digitalWrite(L2, LOW);
+      digitalWrite(R1, LOW);
+      digitalWrite(R2, LOW);
       autoModeOn = 0;
+
     }
   }
 
@@ -121,21 +127,13 @@ void automaticMode() {
 
 void manualMode()
 {
-  Serial.println("Stop");
-    digitalWrite(L1, LOW); 
-    digitalWrite(L2, LOW);
-    digitalWrite(R1, LOW);
-    digitalWrite(R2, LOW);
+    
 
   if (Serial.available() > 0)   //check if any data is available
   {
     incomingByte = Serial.read();   //read incoming data
     Serial.println(incomingByte);
   }
-  if (pumpState){
-    pump();
-  }
-
 
   switch(incomingByte)    //based on received character execute respective commands
   {
@@ -150,6 +148,10 @@ void manualMode()
     analogWrite(L2, motor_speed);
     analogWrite(R1, motor_speed);
     digitalWrite(R2, LOW);
+    if (pumpState){
+    pump();
+    }
+
     break;
 
     case 'f':
@@ -285,13 +287,34 @@ void move_f() {
 
 void move_b() {
   Serial.println("Backward");
-  digitalWrite(L2, LOW); 
-  analogWrite(L1, motor_speed);
-  analogWrite(R2, motor_speed);
-  digitalWrite(R1, LOW); 
   digitalWrite(Roller, LOW);
   digitalWrite(MOP, LOW);
   digitalWrite(Dry, LOW);
+  while (readUsl() == 1 && readUsr() ==1 ){
+  digitalWrite(L2, LOW); 
+  analogWrite(L1, motor_speed);
+  analogWrite(R2, motor_speed);
+  digitalWrite(R1, LOW);
+
+  if (Serial.available() > 0)   //check if any data is available
+  {
+    incomingByte = Serial.read();   //read incoming data
+    Serial.println(incomingByte);
+
+    if (incomingByte == 'X'){
+      autoModeOn = 0;
+      break;
+    }
+  }
+
+  }
+  if (readUsl == 0){
+    turn_l();
+  }else{
+    turn_r();
+  }
+
+
 }
 
 void turn_r() {
@@ -390,10 +413,12 @@ long microsecondsToCentimeters(long microseconds) {
 
 
 void pump(){
+  Serial.println("PumpON");
   digitalWrite(Pump, HIGH);
   delay(pumpOnTime);
   digitalWrite(Pump, LOW);
-  delay (pumpOffTime);
+  Serial.println("PumpOFF");
+  // delay (pumpOffTime);
   }
 
 
@@ -3590,4 +3615,5 @@ void pump(){
 
 
 
-// This is the code for our floor cleaning machine. Which build for Desig protype project. This code fully owned by Group R1, Sasindu malhara (2022/E/126)
+// This is the code for our floor cleaning machine. Which build for Desig protype project. This code fully owned by Group R1, Sasindu malhara (2022/E/126)void setup() {
+
