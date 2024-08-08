@@ -1,0 +1,63 @@
+if (sim_call_type==sim.syscb_init) then
+    -- Retrieve handles for the ultrasonic sensors
+    frontLeftUltrasonic = sim.getObjectHandle('Usfl')
+    frontRightUltrasonic = sim.getObjectHandle('Usfr')
+    sideLeftUltrasonic = sim.getObjectHandle('Usl')
+    sideRightUltrasonic = sim.getObjectHandle('Usr')
+
+    -- Retrieve handles for the car's wheels
+    leftFrontWheel = sim.getObjectHandle('FL')
+    rightFrontWheel = sim.getObjectHandle('FR')
+    leftRearWheel = sim.getObjectHandle('BL')
+    rightRearWheel = sim.getObjectHandle('BR')
+    Roller = sim.getObjectHandle('Roller')
+end
+
+
+if (sim_call_type==sim.syscb_actuation) then
+    -- Read distance values from the ultrasonic sensors
+    result, distanceFrontLeft = sim.readProximitySensor(frontLeftUltrasonic)
+    result, distanceFrontRight = sim.readProximitySensor(frontRightUltrasonic)
+    result, distanceSideLeft = sim.readProximitySensor(sideLeftUltrasonic)
+    result, distanceSideRight = sim.readProximitySensor(sideRightUltrasonic)
+
+    -- Print the sensor readings
+    sim.addStatusbarMessage(string.format("Front Left Distance: %f", distanceFrontLeft))
+    sim.addStatusbarMessage(string.format("Front Right Distance: %f", distanceFrontRight))
+    sim.addStatusbarMessage(string.format("Side Left Distance: %f", distanceSideLeft))
+    sim.addStatusbarMessage(string.format("Side Right Distance: %f", distanceSideRight))
+    
+    sim.setJointTargetVelocity(Roller, -6)
+
+    -- Example movement logic based on sensor readings
+    -- Here you can add your control logic for the car's movement
+    -- For example:
+    if distanceFrontLeft < 0.3 or distanceFrontRight < 0.3 then
+        
+        if distanceSideLeft < 0.3 then
+        -- Stop or turn if an obstacle is detected in front
+        sim.setJointTargetVelocity(leftFrontWheel, 6)
+        sim.setJointTargetVelocity(rightFrontWheel, 6)
+        sim.setJointTargetVelocity(leftRearWheel, 6)
+        sim.setJointTargetVelocity(rightRearWheel, 6)
+    else
+        -- Move forward if no obstacle is detected in front
+        sim.setJointTargetVelocity(leftFrontWheel, -6)
+        sim.setJointTargetVelocity(rightFrontWheel, -6)
+        sim.setJointTargetVelocity(leftRearWheel, -6)
+        sim.setJointTargetVelocity(rightRearWheel, -6)
+    end
+        
+        
+    else
+        -- Move forward if no obstacle is detected in front
+        sim.setJointTargetVelocity(leftFrontWheel, 6)
+        sim.setJointTargetVelocity(rightFrontWheel, -6)
+        sim.setJointTargetVelocity(leftRearWheel, 6)
+        sim.setJointTargetVelocity(rightRearWheel, -6)
+    end
+end
+
+if (sim_call_type==sim.syscb_cleanup) then
+    -- Perform any necessary cleanup here
+end

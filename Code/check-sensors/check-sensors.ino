@@ -67,7 +67,7 @@ void loop() {
 
     long distanceL = readUltrasonicDistance(Usl_Trig, Usl_Echo);
 
-  if (distanceL > 30) {
+  if (distanceL > 20) {
     // Move forward if no obstacle
     digitalWrite(Roller, HIGH);   
     

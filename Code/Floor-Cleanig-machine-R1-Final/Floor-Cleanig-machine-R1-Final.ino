@@ -30,7 +30,7 @@ int motor_speed = 255;
 int autoModeOn = 0;
 char incomingByte;
 bool pumpState = false;
-const long pumpOnTime = 200; 
+const long pumpOnTime = 1000; 
 const long pumpOffTime = 2000; 
 int obstacledistance = 30;
 bool FpumpState = false;
@@ -173,7 +173,7 @@ void manualMode()
     pumpState = false;
     break;
     
-    case 'b':
+    case 'b':                                                                                                          
     Serial.println("Stop");
     digitalWrite(L1, LOW); 
     digitalWrite(L2, LOW);
@@ -3613,7 +3613,7 @@ void pump(){
 
                         for (uint8_t i = 1; i < 4; i++) {
                             if (votes[i] > maxVotes) {
-                                classIdx = i;
+                                classIdx = i;                 
                                 maxVotes = votes[i];
                             }
                         }

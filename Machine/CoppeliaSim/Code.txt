@@ -1,0 +1,345 @@
+
+function sysCall_init()
+  -- Retrieve handles for the ultrasonic sensors
+    frontLeftUltrasonic = sim.getObjectHandle('Usfl')
+    frontRightUltrasonic = sim.getObjectHandle('Usfr')
+    sideLeftUltrasonic = sim.getObjectHandle('Usl')
+    sideRightUltrasonic = sim.getObjectHandle('Usr')
+
+    -- Retrieve handles for the car's wheels
+    leftFrontWheel = sim.getObjectHandle('FL')
+    rightFrontWheel = sim.getObjectHandle('FR')
+    leftRearWheel = sim.getObjectHandle('BL')
+    rightRearWheel = sim.getObjectHandle('BR')
+    Roller = sim.getObjectHandle('Roller')
+end
+
+function sysCall_actuation()
+    automaticMode()
+end
+
+function automaticMode()
+    local pred = {readUsf(), readUsl(), readUsr()}
+    local prediction = predict(pred)
+    
+    if prediction == 0 then
+        turn_l()
+    elseif prediction == 1 then
+        turn_r()
+    elseif prediction == 2 then
+        move_b()
+    elseif prediction == 3 then
+        move_f()
+    end
+end
+
+-- Auto mode functions
+function move_f()
+    -- Move forward if no obstacle is detected in front
+        sim.setJointTargetVelocity(leftFrontWheel, 6)
+        sim.setJointTargetVelocity(rightFrontWheel, -6)
+        sim.setJointTargetVelocity(leftRearWheel, 6)
+        sim.setJointTargetVelocity(rightRearWheel, -6)
+end
+
+function move_b()
+
+    while readUsl() == 1 and readUsr() == 1 do
+        -- Move forward if no obstacle is detected in front
+        sim.setJointTargetVelocity(leftFrontWheel, -6)
+        sim.setJointTargetVelocity(rightFrontWheel, 6)
+        sim.setJointTargetVelocity(leftRearWheel, -6)
+        sim.setJointTargetVelocity(rightRearWheel, 6)
+    end
+    if readUsl() == 0 then
+        turn_l()
+    else
+        turn_r()
+    end
+end
+
+function turn_r()
+    -- Move forward if no obstacle is detected in front
+        sim.setJointTargetVelocity(leftFrontWheel, 6)
+        sim.setJointTargetVelocity(rightFrontWheel, 6)
+        sim.setJointTargetVelocity(leftRearWheel, 6)
+        sim.setJointTargetVelocity(rightRearWheel, 6)
+end
+
+function turn_l()
+   -- Stop or turn if an obstacle is detected in front
+        sim.setJointTargetVelocity(leftFrontWheel, -6)
+        sim.setJointTargetVelocity(rightFrontWheel, -6)
+        sim.setJointTargetVelocity(leftRearWheel, -6)
+        sim.setJointTargetVelocity(rightRearWheel, -6)
+end
+
+function readUsf()
+
+    if distanceFrontLeft < 0.3 or distanceFrontRight < 0.3 then
+        return 1
+    else
+        return 0
+    end
+end
+
+function readUsl()
+
+    if distanceSideLeft < 0.3 then
+        return 1
+    else
+        return 0
+    end
+end
+
+function readUsr()
+
+    if distanceSideRight < 0.3 then
+        return 1
+    else
+        return 0
+    end
+end
+
+function predict(x)
+    local votes = {0, 0, 0, 0}
+
+    -- tree #1
+    if x[1] <= 0.5 then
+        votes[4] = votes[4] + 1
+    else
+        if x[2] <= 0.5 then
+            if x[3] <= 0.5 then
+                votes[2] = votes[2] + 1
+            else
+                votes[1] = votes[1] + 1
+            end
+        else
+            if x[3] <= 0.5 then
+                votes[2] = votes[2] + 1
+            else
+                votes[3] = votes[3] + 1
+            end
+        end
+    end
+
+    -- tree #2
+    if x[3] <= 0.5 then
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            votes[2] = votes[2] + 1
+        end
+    else
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            if x[2] <= 0.5 then
+                votes[1] = votes[1] + 1
+            else
+                votes[3] = votes[3] + 1
+            end
+        end
+    end
+
+    -- tree #3
+    if x[1] <= 0.5 then
+        votes[4] = votes[4] + 1
+    else
+        if x[2] <= 0.5 then
+            if x[3] <= 0.5 then
+                votes[2] = votes[2] + 1
+            else
+                votes[1] = votes[1] + 1
+            end
+        else
+            if x[3] <= 0.5 then
+                votes[2] = votes[2] + 1
+            else
+                votes[3] = votes[3] + 1
+            end
+        end
+    end
+
+    -- tree #4
+    if x[3] <= 0.5 then
+        if x[2] <= 0.5 then
+            if x[1] <= 0.5 then
+                votes[4] = votes[4] + 1
+            else
+                votes[2] = votes[2] + 1
+            end
+        else
+            if x[1] <= 0.5 then
+                votes[4] = votes[4] + 1
+            else
+                votes[2] = votes[2] + 1
+            end
+        end
+    else
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            if x[2] <= 0.5 then
+                votes[1] = votes[1] + 1
+            else
+                votes[3] = votes[3] + 1
+            end
+        end
+    end
+
+    -- tree #5
+    if x[1] <= 0.5 then
+        votes[4] = votes[4] + 1
+    else
+        if x[3] <= 0.5 then
+            votes[2] = votes[2] + 1
+        else
+            if x[2] <= 0.5 then
+                votes[1] = votes[1] + 1
+            else
+                votes[3] = votes[3] + 1
+            end
+        end
+    end
+
+    -- tree #6
+    if x[2] <= 0.5 then
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            if x[3] <= 0.5 then
+                votes[2] = votes[2] + 1
+            else
+                votes[1] = votes[1] + 1
+            end
+        end
+    else
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            if x[3] <= 0.5 then
+                votes[2] = votes[2] + 1
+            else
+                votes[3] = votes[3] + 1
+            end
+        end
+    end
+
+    -- tree #7
+    if x[3] <= 0.5 then
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            votes[2] = votes[2] + 1
+        end
+    else
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            if x[2] <= 0.5 then
+                votes[1] = votes[1] + 1
+            else
+                votes[3] = votes[3] + 1
+            end
+        end
+    end
+
+    -- tree #8
+    if x[3] <= 0.5 then
+        if x[2] <= 0.5 then
+            if x[1] <= 0.5 then
+                votes[4] = votes[4] + 1
+            else
+                votes[2] = votes[2] + 1
+            end
+        else
+            if x[1] <= 0.5 then
+                votes[4] = votes[4] + 1
+            else
+                votes[2] = votes[2] + 1
+            end
+        end
+    else
+        if x[2] <= 0.5 then
+            if x[1] <= 0.5 then
+                votes[4] = votes[4] + 1
+            else
+                votes[1] = votes[1] + 1
+            end
+        else
+            if x[1] <= 0.5 then
+                votes[4] = votes[4] + 1
+            else
+                votes[3] = votes[3] + 1
+            end
+        end
+    end
+
+    -- tree #9
+    if x[2] <= 0.5 then
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            if x[3] <= 0.5 then
+                votes[2] = votes[2] + 1
+            else
+                votes[1] = votes[1] + 1
+            end
+        end
+    else
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            if x[3] <= 0.5 then
+                votes[2] = votes[2] + 1
+            else
+                votes[3] = votes[3] + 1
+            end
+        end
+    end
+
+    -- tree #10
+    if x[2] <= 0.5 then
+        if x[3] <= 0.5 then
+            if x[1] <= 0.5 then
+                votes[4] = votes[4] + 1
+            else
+                votes[2] = votes[2] + 1
+            end
+        else
+            if x[1] <= 0.5 then
+                votes[4] = votes[4] + 1
+            else
+                votes[1] = votes[1] + 1
+            end
+        end
+    else
+        if x[1] <= 0.5 then
+            votes[4] = votes[4] + 1
+        else
+            votes[3] = votes[3] + 1
+        end
+    end
+
+    -- return argmax of votes
+    local classIdx = 1
+    local maxVotes = votes[1]
+
+    for i = 2, 4 do
+        if votes[i] > maxVotes then
+            classIdx = i
+            maxVotes = votes[i]
+        end
+    end
+
+    return classIdx
+end
+
+
+
+if (sim_call_type==sim.syscb_cleanup) then
+    -- Perform any necessary cleanup here
+end
+
+
